@@ -21,8 +21,16 @@ jobs:
         deno-version:
           - 2.x
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout for PR
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Checkout for Push
+        if: github.event_name == 'push'
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -36,13 +44,8 @@ jobs:
       - name: Run build script
         run: npm run build -w=add-pkg-exports --if-present
       - name: Check if repo is porcelain
-        run: |
-          if [[ -z $(git diff --name-only) ]]; then
-            echo "The repository is clean."
-          else
-            echo "The repository has unstaged changes:"
-            git diff
-            exit 1
-          fi
+        run: >
+          git diff --ignore-space-at-eol --quiet || (echo "Uncommitted changes
+          detected" && git diff --name-only && exit 1)
       - name: Report results
         run: npm run test -w=add-pkg-exports --if-present

@@ -9,13 +9,7 @@ import {glob} from 'glob'
 
 const porcelainCheck =
   `
-if [[ -z $(git diff --name-only) ]]; then
-  echo "The repository is clean."
-else
-  echo "The repository has unstaged changes:"
-  git diff
-  exit 1
-fi
+git diff --ignore-space-at-eol --quiet || (echo "Uncommitted changes detected" && git diff --name-only && exit 1)
 `.trim() + '\n'
 
 const buildAndTestTemplate = (name: string = '', isRoot = name === '') => ({
@@ -42,8 +36,20 @@ const buildAndTestTemplate = (name: string = '', isRoot = name === '') => ({
       },
       steps: [
         {
-          name: 'Checkout repository',
-          uses: 'actions/checkout@v2',
+          name: 'Checkout for PR',
+          if: "github.event_name == 'pull_request'",
+          uses: 'actions/checkout@v3',
+          with: {
+            ref: '${{ github.event.pull_request.head.sha }}',
+          },
+        },
+        {
+          name: 'Checkout for Push',
+          if: "github.event_name == 'push'",
+          uses: 'actions/checkout@v3',
+          with: {
+            ref: '${{ github.ref }}',
+          },
         },
         {
           name: 'Set up Node.js',
