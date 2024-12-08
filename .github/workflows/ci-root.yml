@@ -46,6 +46,6 @@ jobs:
       - name: Check if repo is porcelain
         run: >
           git diff --ignore-space-at-eol --quiet || (echo "Uncommitted changes
-          detected" && exit 1)
+          detected" && git diff --name-only && exit 1)
       - name: Report results
         run: npm run test  --if-present

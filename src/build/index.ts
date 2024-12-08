@@ -7,7 +7,7 @@ import {execSync} from 'node:child_process'
 
 const porcelainCheck =
   `
-git diff --ignore-space-at-eol --quiet || (echo "Uncommitted changes detected" && exit 1)
+git diff --ignore-space-at-eol --quiet || (echo "Uncommitted changes detected" && git diff --name-only && exit 1)
 `.trim() + '\n'
 
 const buildAndTestTemplate = (name: string = '', isRoot = name === '') => ({
