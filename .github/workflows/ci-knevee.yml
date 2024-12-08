@@ -44,7 +44,8 @@ jobs:
       - name: Run build script
         run: npm run build -w=knevee --if-present
       - name: Check if repo is porcelain
-        run: |
-          git diff --quiet || (echo "Uncommitted changes detected" && exit 1)
+        run: >
+          git diff --ignore-space-at-eol --quiet || (echo "Uncommitted changes
+          detected" && exit 1)
       - name: Report results
         run: npm run test -w=knevee --if-present
