@@ -45,12 +45,6 @@ jobs:
         run: npm run build -w=knevee --if-present
       - name: Check if repo is porcelain
         run: |
-          if [[ -z $(git diff --exit-code) ]]; then
-            echo "The repository is clean."
-          else
-            echo "The repository has unstaged changes:"
-            git diff
-            exit 1
-          fi
+          git diff --quiet || (echo "Uncommitted changes detected" && exit 1)
       - name: Report results
         run: npm run test -w=knevee --if-present

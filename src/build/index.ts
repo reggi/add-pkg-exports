@@ -7,13 +7,7 @@ import {execSync} from 'node:child_process'
 
 const porcelainCheck =
   `
-if [[ -z $(git diff --exit-code) ]]; then
-  echo "The repository is clean."
-else
-  echo "The repository has unstaged changes:"
-  git diff
-  exit 1
-fi
+git diff --quiet || (echo "Uncommitted changes detected" && exit 1)
 `.trim() + '\n'
 
 const buildAndTestTemplate = (name: string = '', isRoot = name === '') => ({
